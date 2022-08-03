@@ -1,5 +1,6 @@
 <?php
 session_start();
+$id="";
 if(isset($_SESSION["id"])){
        if(!isset($_COOKIE["student"])){    
        }else{
@@ -20,6 +21,9 @@ if(isset($_SESSION["id"])){
     <style>
          *{
             box-sizing: border-box;
+        }
+        body{
+            background-color: #fefec6;
         }
         .container{
             display: flex;
@@ -62,120 +66,205 @@ if(isset($_SESSION["id"])){
        border-radius: 50%;
        padding: 10% 10%;
    }
-   #logout{
-       background-color: red;
-       padding: 12% 12%;
-       border-radius: 10%;
-   }
-   #logout:hover{
-       background-color: rgb(243, 130, 130);
-   }
-        .white{
+   .nav{
+           display: flex;
+           justify-content: space-between;
+           padding: 2% 10%;
+           align-items: center;
+       }
+       #profile_img{
+           width: 10%;
+           border: 2px solid red;
+           border-radius: 50%;
+           padding: 2% 2%;
+       }#profile_img:hover{
+           background-color: rgb(241, 238, 238);
+       }
+       #back{
+             border: 2px solid blue;
+             color: blue;
+             background-color: white;
+             border-radius: 5px;
+             padding: 2.5% 2.5%;
+       }#back:hover{
+           color: white;
+           background-color: blue;
+       }
+       #logout{
+        border: 2px solid red;
+             color: red;
+             background-color: white;
+             border-radius: 5px;
+             padding: 2.5% 2.5%;
+       }#logout:hover{
+           color: white;
+           background-color: red;
+       }
+       .left_nav{
+           display: flex;
+           width: 40%;
+           justify-content: space-between;
+           align-items: center;
+       }
+       .right_nav{
+               display: flex;
+               width: 20%;
+               justify-content: flex-end;
+               align-items: center;
+       }
+       .option{
+           border: none;
            background-color: white;
-           
-        }.green{
-         background-color:greenyellow ;
-        }
+           font-size: 20px;
+       }
+       .option:hover{
+           background-color: grey;
+           color: white;
+           border-radius: 5px;
+           padding: 2% 2%;
+
+       }
+      
     </style>
 </head>
 <body>
+    
 <nav class="nav">
-        <div>
-            <img src="./user.png" alt="user">
+        <div class="left_nav">
+          <img src="./user.png" alt="profile_img" id="profile_img" onclick="profile_div()">
         </div>
-        <div>
-           <button id="logout" onclick="logout()">Logout</button>
+        <div class="right_nav">
+            <button id="back" onclick="back()">Back</button>
+        
         </div>
+        
     </nav>
 <div class="container">
         <table cellspacing=0>
+        <tr>
+                <th class="white">ass_id</th>
+                <th class="green">assignment</th>
+                <th class="white">rev_user</th>
+                <th class="green">link</th>
+                <th class="white">stat</th>
+                <th class="green">last_date_submission</th>
+                <th class="white">action</th>
+            </tr>
        <?php
         include '../MODULES/connect.php';
-        $sql="select title,link,".$id."_status,".$id."_comment from assignmet;";
-        // echo $sql;
-        $result=$conn->query($sql);
-        $status=$id.'_status';
-        $comment=$id.'_comment';
-       while($row=$result->fetch_assoc()){
+        $sql_1='select * from submission inner join assignments on submission.assignment_id=assignments.assignment_id where stud_user="'.$_COOKIE["student"].'";';
+        $sql_2='select * from assignments where assignment_id not in (select assignments.assignment_id from submission inner join assignments on submission.assignment_id=assignments.assignment_id where stud_user="'.$_COOKIE["student"].'");';
+        $result_1=$conn->query($sql_1);
+        $result_2=$conn->query($sql_2);
+        while($row=$result_1->fetch_assoc()){
+          
             echo '<tr>
-            <td class="white">'.++$sl.'</td>
-            <td class="green"><a href="'.$row["link"].'"><strong>'.$row["title"].'</strong></a></td>
+            <td class="white">'.$row["assignment_id"].'</td>
+            <td class="green"><a href="'.$row["assignmet_link"].'"><strong>'.$row["assignment_name"].'</strong></a></td>
+            <td class="green">'.$row["rev_user"].'</td>
+            <td class="white"><a href="'.$row["link"].'" target="_blank"><button>view</button></a></td>
             <td class="white">';
-            if($row[$status]==0){
-               echo "Not initialised";
-            }else if($row[$status]==-1){
-                  echo "Completed";
+            if($row["stat"]=="-1"){
+                    echo "Accepted";
             }else{
-               echo "Iteration :".$row[$status];
+                echo "in iteration ";
             }
-            echo '</td>
-            <td class="green">'.$row[$comment].'</td>
-            <td class="white"><button onclick="accept(this.className)" class="'.$row["title"].'">Accept</button>
-            <button onclick="iteration(this.className)" class="'.$row["title"].'">Iteration</button>
-            </td>
-        </tr>';
+            echo'</td>
+            <td class="green">'.date('r',$row["last_submission"]).'</td>
+            <td class="white">'; 
+            if($row["rev_user"]==$_SESSION["id"]){
+                echo'<button class="'.$row["assignment_id"].'" onclick="comment(this.className)">comment</button><button class="'.$row["assignment_id"].'" onclick="accept(this.className)">accept</button>';
+            }else{
+                echo 'you are not the reviewer';
+            }
+            
+            echo'</td>
+        </tr>
+            ';
+            
+           
+       }
+       while($row=$result_2->fetch_assoc()){
+           echo '
+           <tr>
+           <td class="white">'.$row["assignment_id"].'</td>
+           <td class="green"><a href="'.$row["assignmet_link"].'"><strong>'.$row["assignment_name"].'</strong></a></td>
+           <td class="green"></td>
+           <td class="white"></a></td>
+           <td class="white">not initiated</td>
+           <td class="green"></td>
+           <td></td>
+           </tr>
+           ';
        }
        ?>
        </table>
 </div>
 <script>
-     function accept(st){
-        // xhr=new XMLHttpRequest();
+    //  function accept(st){
+       
+    //     document.cookie="status=";
+    //     document.cookie="action=accept";
+    //     document.cookie="ass="+st;
+    //     let status =<?php
+    //     $sql_1='select '.$id.'_status from assignmet where title="'.$_COOKIE["ass"].'";';
+    //     $result=$conn->query($sql_1);
+    //     $row=$result->fetch_array();
+    //     echo $row[$status];
+    //     ?>
+
+    //     document.cookie="status="+status;
+    //     window.location.assign("http://localhost:8001/TEMPLATES/comment.php");
+    //  }
+    //  function iteration(st){
+    //     document.cookie="action=iteration";
+    //     document.cookie="ass="+st;
+    //     let status =<?php
+    //     $sql_1='select '.$id.'_status from assignmet where title="'.$_COOKIE["ass"].'";';
+    //     $result=$conn->query($sql_1);
+    //     $row=$result->fetch_array();
+    //     echo $row[$status];
+    //     ?>
+
+    //     document.cookie="status="+status;
+    //     window.location.assign("http://localhost:8001/TEMPLATES/comment.php");
+    //  }
+     function back(){
+         window.location.assign("http://localhost:8001/TEMPLATES/dashboard_reviewer.php");
+     }
+     function comment(pass){
+        // console.log(pass)
+        console.log(pass)
+        let stud="<?php echo $id?>";
+        document.cookie="ass_id="+pass;
+        document.cookie="action=comment";
+        
+        // let xhr=new XMLHttpRequest()
         // xhr.onreadystatechange=function(){
-        //       if(this.readyState==4 && this.status==200){
-        //          window.location.assign("http://localhost:8001/TEMPLATES/comment.php");
-        //       }
-        // };
-        // xhr.open("POST","./comment.php");
+        //           if(this.status==200 &&this.readyState==4){
+                    window.location.assign("http://localhost:8001/TEMPLATES/comment_1.php");
+        //           }
+        // }
+        // xhr.open("POST","./comment_1.php");
         // xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        // xhr.send('action="submit');
-        document.cookie="status=";
+        // xhr.send("stud="+stud+"&ass_id="+pass+"&action=comment");
+     }
+     function accept(pass){
+         let stud="<?php echo $id?>";
+         console.log("stud="+stud+';ass_id='+pass+';action=accept')
+        document.cookie="ass_id="+pass;
         document.cookie="action=accept";
-        document.cookie="ass="+st;
-        let status =<?php
-        $sql_1='select '.$id.'_status from assignmet where title="'.$_COOKIE["ass"].'";';
-        $result=$conn->query($sql_1);
-        $row=$result->fetch_array();
-        echo $row[$status];
-        ?>
-
-        document.cookie="status="+status;
-        window.location.assign("http://localhost:8001/TEMPLATES/comment.php");
-     }
-     function iteration(st){
-        // xhr=new XMLHttpRequest();
+        // let xhr=new XMLHttpRequest();
         // xhr.onreadystatechange=function(){
-        //     if(this.readyState==4 && this.status==200){
-        //         window.location.assign("http://localhost:8001/TEMPLATES/comment.php");
-        //     }
-        // };
-        // xhr.open("POST","./comment.php");
+        //     if(this.status==200 && this.readyState==4){
+                       window.location.assign("http://localhost:8001/TEMPLATES/comment_1.php");
+        //             }
+        // }
+        // xhr.open("POST","./comment_1.php");
         // xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        // xhr.send('action=iteration');
-        
-        
-        document.cookie="action=iteration";
-        document.cookie="ass="+st;
-        let status =<?php
-        $sql_1='select '.$id.'_status from assignmet where title="'.$_COOKIE["ass"].'";';
-        $result=$conn->query($sql_1);
-        $row=$result->fetch_array();
-        echo $row[$status];
-        ?>
-
-        document.cookie="status="+status;
-        window.location.assign("http://localhost:8001/TEMPLATES/comment.php");
+        // xhr.send("stud="+stud+"&ass_id="+pass+"&action=accept");
      }
-     function logout(){
-            let xhr=new XMLHttpRequest();
-            xhr.open("POST","../MODULES/logout.php");
-            xhr.onreadystatechange=function(){
-                if(this.readyState==4 && this.status==200)
-                window.location.assign("http://localhost:8001/")
-            };
-            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xhr.send("action=logout");
-        }
+     
 </script>
 </body>
 </html>

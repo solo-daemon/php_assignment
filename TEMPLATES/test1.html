@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    *{
+        box-sizing: border-box;
+    }
+    textarea{
+        resize: none;
+        outline: none;
+    }
+    .send{
+        background-color: white;
+        color: blue;
+        border: 2px solid blue;
+        border-radius: 5px;
+        margin: 0 2%;
+    }
+    .send:hover{
+        background-color: blue;
+        color: white;
+    }
+    .comment{
+        display: flex;
+        justify-content: space-evenly;
+        
+    }
+    .chat{
+        width: 70%;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+       background-color: antiquewhite;
+       padding: 1% 0;
+    }
+    .chat_head{
+        display: flex;
+        justify-content: center;
+    }
+    .text{
+        border: 2px solid blue;
+        border-radius: 5px;
+    }
+    .history{
+        height: 300px;
+        background-color: white;
+        width: 90%;
+        margin:1% 0;
+        overflow: scroll;
+        overflow-x: hidden;
+    }
+    .history::-webkit-scrollbar{
+        display: none;
+    }
+</style>
+<body>
+    <div class="chat_head">
+    <div class="chat">
+        <div class="history">
+        <fieldset>
+            <legend>coolboy</legend>
+            <span>Lorem ipsum dolor sit amet.</span>
+        </fieldset>
+        </div>
+        <div class="comment">
+            <textarea name="text" id="" cols="65" rows="2" class="text"></textarea>
+            <button class="send">SEND</button>
+        </div>
+    </div>
+    
+</div>
+</body>
+</html>

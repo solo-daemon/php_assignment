@@ -47,16 +47,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST"){
         $sql->close();
         $sql_1->close();
          $alert=1;
-         if($role=="Student"){
-             $sql_2='alter table assignmet add('.$user.'_status int, '.$user.'_comment LONGTEXT);';
-             $sql_3='update assignmet set '.$user.'_status=0;';
-             $conn->query($sql_2);
-             $conn->query($sql_3);
-         }
-        }else{
-                
-                session_destroy();
-           }
+
     }
 
 function test_input($data) {
@@ -161,12 +152,14 @@ function test_input($data) {
             xhr.open("GET","../MODULES/user_search.php?q="+str,true);
             xhr.send();
         }}
-    </script>
     <?php
+
     if($alert==1){
-        echo '<script>window.alert("account created successfully")</script>';
+        echo 'window.alert("account created successfully")';
         header("Location : http://localhost:8001/",true,301);
     }
+    
     ?>
+    </script>
 </body>
 </html>

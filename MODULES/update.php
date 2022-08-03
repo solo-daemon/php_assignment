@@ -1,13 +1,13 @@
 <?php
 if($_SERVER["REQUEST_METHOD"]=="POST"){
     echo "hello";
-    $stud=$_POST["stud"];
-    $comm=$_POST["comm"];
+    $stud=test_input($_POST["stud"]);
+    $comm=test_input($_POST["comm"]);
 
-    $ass=$_POST["ass"];
-    $action=$_POST['action'];
+    $ass=test_input($_POST["ass"]);
+    $action=test_input($_POST['action']);
     if($action=="iteration"){
-          $status=$_POST['status']+1;
+          $status=test_input($_POST['status'])+1;
     }else if($action=="accept"){
         $status=-1;
     }
@@ -16,4 +16,10 @@ if($_SERVER["REQUEST_METHOD"]=="POST"){
     echo $sql;
    $result=$conn->query($sql);
 }
+function test_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+  }
 ?>
