@@ -1,3 +1,24 @@
+<?php
+    require './MODULES/connect.php';
+if(isset($_COOKIE["id"])){
+    $sql_5='select username from session where php_session="'.$_COOKIE["id"].'";';
+    $result_5=$conn->query($sql_5);
+    $row_5=$result_5->fetch_array();
+    $_SESSION["id"]=$row_5["username"];
+    setcookie("just",$_SESSION,time());
+    $sql_6='select Role from users where username="'.$_SESSION["id"].'";';
+    echo $sql_6;
+    $result_6=$conn->query($sql_6);
+    $row_6=$result_6->fetch_array();
+    if($row_6["Role"]=="Reviewer"){
+        header("Location: http://localhost:8001/TEMPLATES/dashboard_reviewer.php", true, 301);
+    }else{
+        header("Location: http://localhost:8001/TEMPLATES/dashboard_student.php", true, 301);
+    }
+
+}
+  $sess= session_id();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -62,6 +83,7 @@
 
 <body>
     <?php
+
     $ver = 0;
     $err = 0;
     $redir = 0;
@@ -79,29 +101,38 @@
             $pass = hash('sha256', test_input($_POST["pass"]), true);
         }
         if ($err == 0) {
-            require './MODULES/connect.php';
             $sql = 'select * from auth where username="' . $user . '";';
             $sql_1 = 'select Role from users where username="' . $user . '";';
             $result = $conn->query($sql);
             if ($result->num_rows > 0) {
                 $row = $result->fetch_array();
                 if ($row["password"] == $pass) {
+                    setcookie("id",session_id(),time()+(86400*30));
                     echo "successfull login !";
                     $_SESSION["id"] = $user;
                     $result_1 = $conn->query($sql_1);
-                    include './MODULES/objects.php';
                     echo "hello";
                     echo $result_1->num_rows;
                     $row_1 = $result_1->fetch_array();
+                    $sql_7='select * from session where php_session="'.session_id().'";';
+                    $result_7=$conn->query($sql_7);
+                    if($result_7->num_rows>0){
+                        $sql_8='update session set username="'.$_SESSION["id"].'" where php_session="'.session_id().'";';
+                        $conn->query($sql_8);
+                        echo $sql_8;
+                    }else{
+
+                        $sql_9='insert into session(php_session,username) values("'.session_id().'","'.$_SESSION["id"].'")';
+                        $conn->query($sql_9);
+                        echo $sql_9;
+                    }
                     if ($row_1["Role"] == "Student") {
                         echo "student";
-                        $obj = new Student();
                         $_SESSION['role'] = $row_1["Role"];
                         $redir = 1;
                         header("Location: http://localhost:8001/TEMPLATES/dashboard_student.php", true, 301);
                     } else if ($row_1["Role"] == "Reviewer") {
                         echo "Reviewer";
-                        $obj = new Reviewer();
                         $_SESSION['role'] = $row_1["Role"];
                         $redir = 2;
                         header("Location: http://localhost:8001/TEMPLATES/dashboard_reviewer.php", true, 301);

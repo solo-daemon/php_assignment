@@ -6,6 +6,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST"){
         $_SESSION["id"]=null;
         session_unset();
         session_destroy();
+        setcookie("id",session_id(),time(),'/');
     }
 }
 ?>

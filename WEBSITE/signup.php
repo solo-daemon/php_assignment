@@ -47,8 +47,8 @@ if($_SERVER["REQUEST_METHOD"]=="POST"){
         $sql->close();
         $sql_1->close();
          $alert=1;
-
-    }
+   
+    }}
 
 function test_input($data) {
     $data = trim($data);
@@ -157,8 +157,8 @@ function test_input($data) {
     if($alert==1){
         echo 'window.alert("account created successfully")';
         header("Location : http://localhost:8001/",true,301);
-    }
     
+    }
     ?>
     </script>
 </body>
